@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -6,23 +6,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { of } from 'rxjs';
-
-const mustContainQuestionMark = (control: AbstractControl<String>) => {
-  if (control.value.includes('?')) {
-    return null;
-  }
-  return {
-    doesNotContainsQuestionMark: true,
-  };
-};
-
-const emailIsUnique = (control: AbstractControl<String>) => {
-  if (control.value === 'test@example.com') {
-    return of(null);
-  }
-  return of({ notUnique: true });
-};
+import { debounceTime, of } from 'rxjs';
+import { emailIsUnique, mustContainQuestionMark } from '../validators';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +16,9 @@ const emailIsUnique = (control: AbstractControl<String>) => {
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+
   form = new FormGroup({
     // questo approccio ci fornisce un migliore supporto da parte di typescritp
     // ogni proprietà rappresenta un controllore del form
@@ -62,6 +49,31 @@ export class LoginComponent {
       this.form.controls.password.dirty &&
       this.form.controls.password.invalid
     );
+  }
+
+  ngOnInit() {
+    const savedLogin = window.localStorage.getItem('saved-login-form');
+
+    if (savedLogin) {
+      const { email }: { email: string } = JSON.parse(savedLogin);
+
+      if (typeof email === 'string') {
+        this.form.patchValue({ email }); // permette di settare un valore del formGroup
+      }
+    }
+
+    const subscription = this.form.valueChanges
+      .pipe(debounceTime(500))
+      .subscribe({
+        next: (value) => {
+          window.localStorage.setItem(
+            'saved-login-form',
+            JSON.stringify({ email: value.email })
+          );
+        },
+      });
+
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   onSubmit() {
