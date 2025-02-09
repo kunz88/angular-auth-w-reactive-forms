@@ -4,15 +4,24 @@
   <div class="control-row">
     <div class="control no-margin">
       <label for="email">Email</label>
-      <input id="email" type="email" formControlName="email" />
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        class="input input-bordered w-full max-w-xs"
+      />
     </div>
 
     <div class="control no-margin">
       <label for="password">Password</label>
-      <input id="password" type="password" formControlName="password" />
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        class="input input-bordered w-full max-w-xs"
+      />
     </div>
-
-    <button class="button" type="submit">Login</button>
+    <button class="btn btn-primary" type="submit">Login</button>
   </div>
   @if (emailIsInvalid){
   <p class="control-error">Please enter a valid email address</p>

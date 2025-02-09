@@ -2,7 +2,7 @@ import { AbstractControl } from '@angular/forms';
 import { of } from 'rxjs';
 
 export const mustContainQuestionMark = (control: AbstractControl<String>) => {
-  if (control.value.includes('?')) {
+  if (control.value?.includes('?')) {
     return null;
   }
   return {

@@ -40,7 +40,7 @@ export class SignupComponent {
           ],
         }),
         confirmPassword: new FormControl('', {
-          validators: [Validators.required, Validators.email],
+          validators: [Validators.required,],
         }),
       },
       {
